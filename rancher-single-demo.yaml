@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rancher-http
+  labels:
+    name: rancher-http
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 80
+  selector:
+    name: rancher-cattle
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rancher-https
+  labels:
+    name: rancher-https
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8443
+    targetPort: 443
+  selector:
+    name: rancher-cattle
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name:  rancher-cattle-deploy
+  labels:
+    name:  rancher-cattle
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: rancher-cattle
+    spec:
+      containers:
+      - image:  rancher/rancher:latest
+        name:  rancher-cattle-cntnr
+        ports:
+        - containerPort:  80
+          name:  rancher-cattle-http
+        - containerPort:  443
+          name:  rancher-cattle-https
+        volumeMounts:
+        - mountPath: /var/lib/rancher
+          name: data
+        imagePullPolicy: Always
+      volumes:
+        - name: data
+          emptyDir: {}
+restartPolicy: Always
