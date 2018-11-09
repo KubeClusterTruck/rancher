@@ -50,9 +50,9 @@ spec:
         name:  rancher-cattle-cntnr
         ports:
         - containerPort:  80
-          name:  rancher-cattle-http
+          name:  cattle-http
         - containerPort:  443
-          name:  rancher-cattle-https
+          name:  cattle-https
         volumeMounts:
         - mountPath: /var/lib/rancher
           name: data
